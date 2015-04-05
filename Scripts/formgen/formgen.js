@@ -1,7 +1,8 @@
+var LANG = 'us';
 (function ($) {
     var myApp = angular.module('myApp', []);
     myApp.controller('FormToolBox', ['$scope', '$http', function ($scope, $http) {
-        debugger;
+        //debugger;
         var target = $('body');
         $scope.defs = [
 
@@ -127,6 +128,32 @@
         ];
 
         function initElements() {
+
+            jQuery("#dialog_elt").dialog({
+                bgiframe: true,
+                autoOpen: false,
+                height: 620,
+                width: 480,
+                modal: true,
+                buttons: {
+                    'Save': function () {
+                        var bValid = true;
+                        //var _no = jQuery("#e_id").val();
+
+                        if (bValid) {
+                            //saveInputPanel(_no);
+
+                            jQuery(this).dialog('close');
+                        }
+                    },
+                    Cancel: function () {
+                        jQuery(this).dialog('close');
+                    }
+                },
+                close: function () {
+                    //allFields.val('').removeClass('ui-state-error');
+                }
+            });
             //for (elem in $scope.defs) {
             //    //var icon = $('<span class="icon '+defs[elem].iconClass+'" create_action="createElement" type="'+elem+'"></span>');
             //    //$(icon).appendTo('#elements');
@@ -139,7 +166,7 @@
                 cursor: "move",
                 cursorAt: { left: -10, top: 10 },
                 stop: function (event, ui) {
-                    debugger;
+                    //debugger;
                     eval($(this).attr('create_action') + '("' + $(this).attr('type') + '");');
                 },
                 helper: function (event) {
@@ -150,9 +177,9 @@
         }
 
         function createElement(element) {
-            debugger;
+            //debugger;
             //var elObj = $scope.defs[element];
-           
+
             var elObj = $.grep($scope.defs, function (e) { return e.type == element; })[0];
 
             var newElem = $(elObj.tag);
@@ -173,7 +200,11 @@
                     return false;
                 }
             });
-
+            newElem.on('dblclick', function (e) {
+                //alert('1');
+                editElement(newElem, elObj);
+                return false;
+            })
             container.on('mouseover', function () {
                 moveHandle.css({
                     'left': newElem.width() + 'px',
@@ -205,44 +236,67 @@
         }
 
         function editElement(target, elObj) {
-            var props = new Array;
+            //debugger;
+            typeToAdd = elObj.type.toLowerCase();
+            if (typeToAdd.length == 0) typeToAdd = "text";
+            if (typeToAdd == "inputtext") typeToAdd = "text";
+            if (typeToAdd == "password") typeToAdd = "text";
+            if (typeToAdd == "Radiobutton") typeToAdd = "radio";
+            if (typeToAdd == "checkbox") typeToAdd = "radio";
+            if (typeToAdd == "dropdown") typeToAdd = "select";
+            if (typeToAdd == "list") typeToAdd = "select";
+            if (typeToAdd == "file") typeToAdd = "text";
+            if (typeToAdd == "datepicker") typeToAdd = "date";
+            jQuery("#dialog_elt").load("panel/" + LANG + "/input_" + typeToAdd + ".html",
+			    function () {
+			        //debugger;
+			        //jQuery("#e_id").val( _no ) ;
+			        //if ( rblEltArray[ _no]  != null) 
+			        //{
+			        //    rblEltArray[ _no].showForm() ;
+			        //}
+			        jQuery("#dialog_elt").dialog('open');
+			    });
 
-            properties = $('<div id="prop-form" title="Properties"></div>');
-            propForm = $('<form></form>');
+            //debugger;
+            //var props = new Array();
 
-            var openForm = false; /*open the properties windows if we have more than one input*/
+            //properties = $('<div id="prop-form" title="Properties"></div>');
+            //propForm = $('<form></form>');
 
-            if (typeof elObj.html != 'undefined') {
-                $('<textarea id="html">' + target.html() + '</textarea>').appendTo($(propForm));
-                openForm = true;
-            }
+            //var openForm = false; /*open the properties windows if we have more than one input*/
 
-            for (prop in elObj.props) {
-                $('<input class="elem-prop" id="' + prop + '" value="' + target.attr(prop) + '" />').appendTo($(propForm));
-                openForm = true;
-            }
+            //if (typeof elObj.html != 'undefined') {
+            //    $('<textarea id="html">' + target.html() + '</textarea>').appendTo($(propForm));
+            //    openForm = true;
+            //}
 
-            if (!openForm) return false;
-            $(propForm).appendTo($(properties));
-            $(properties).appendTo('body');
-            $(function () {
-                $("#prop-form").dialog({
-                    modal: true,
-                    buttons: {
-                        "Ok": function () {
-                            if (typeof $('#html').val() != 'undefined')
-                                target.html($('#html').val());
-                            $('.elem-prop').each(function () {
-                                target.attr($(this).attr('id'), $(this).val());
-                            });
-                            $(this).dialog("close");
-                        }
-                    },
-                    close: function () {
-                        $('#prop-form').remove();
-                    }
-                });
-            });
+            //for (prop in elObj.props) {
+            //    $('<input class="elem-prop" id="' + prop + '" value="' + target.attr(prop) + '" />').appendTo($(propForm));
+            //    openForm = true;
+            //}
+
+            //if (!openForm) return false;
+            //$(propForm).appendTo($(properties));
+            //$(properties).appendTo('body');
+            //$(function () {
+            //    $("#prop-form").dialog({
+            //        modal: true,
+            //        buttons: {
+            //            "Ok": function () {
+            //                if (typeof $('#html').val() != 'undefined')
+            //                    target.html($('#html').val());
+            //                $('.elem-prop').each(function () {
+            //                    target.attr($(this).attr('id'), $(this).val());
+            //                });
+            //                $(this).dialog("close");
+            //            }
+            //        },
+            //        close: function () {
+            //            $('#prop-form').remove();
+            //        }
+            //    });
+            //});
         }
 
         function moveElement(element, target) {
@@ -344,20 +398,20 @@
         }
 
         $scope.initElementContainers = function (selector) {
-            debugger;
+            //debugger;
             $(selector).droppable(
-	          {
-	              cursor: 'move',
-	              accept: 'ul#rbMenu li',
-	              helper: 'clone',
-	              opacity: '0.5',
-	              drop: function (event, ui) {
-	                  debugger;
-	                  createElement($(ui.draggable).attr('type'))
-	                  //addNewElement(ui, this);
-	              }
-	          }
-	        );
+              {
+                  cursor: 'move',
+                  accept: 'ul#rbMenu li',
+                  helper: 'clone',
+                  opacity: '0.5',
+                  drop: function (event, ui) {
+                      //debugger;
+                      createElement($(ui.draggable).attr('type'))
+                      //addNewElement(ui, this);
+                  }
+              }
+            );
             $(selector).on('mouseover', function () {
                 /*
                     Determines element placement.

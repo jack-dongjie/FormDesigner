@@ -97,7 +97,8 @@ function createElement(element){
 	editElement(newElem, elObj);
 }
 
-function editElement(target, elObj){
+function editElement(target, elObj) {
+    debugger;
 	var props = new Array;
 
 	properties = $('<div id="prop-form" title="Properties"></div>');
